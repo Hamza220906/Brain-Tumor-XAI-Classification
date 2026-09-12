@@ -25,15 +25,8 @@ def load_model_and_hooks():
     model = models.resnet18(pretrained=False)
     model.fc = torch.nn.Linear(model.fc.in_features, 4)
     
-    # Hugging Face 
-    from huggingface_hub import hf_hub_download
-    model_path = hf_hub_download(
-        repo_id="Hamza220906/brain-tumor-resnet18", 
-        filename="brain_tumor_model_test.pth"
-    )
-    model.load_state_dict(torch.load(model_path, map_location='cpu'))
+    model.load_state_dict(torch.load('brain_tumor_model_test.pth', map_location='cpu'))
     model.eval()
-    
     
     activations = {}
     gradients = {}
