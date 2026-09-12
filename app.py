@@ -24,19 +24,23 @@ DISCLAIMER = "⚠️ AI-generated suggestion based on NCCN guidelines. Final dec
 def load_model_and_hooks():
     model = models.resnet18(pretrained=False)
     model.fc = torch.nn.Linear(model.fc.in_features, 4)
-    model.load_state_dict(torch.load('brain_tumor_model_test.pth', map_location='cpu'))
+    
+    # Hugging Face 
+    from huggingface_hub import hf_hub_download
+    model_path = hf_hub_download(
+        repo_id="Hamza220906/brain-tumor-resnet18", 
+        filename="brain_tumor_model_test.pth"
+    )
+    model.load_state_dict(torch.load(model_path, map_location='cpu'))
     model.eval()
     
-    # Grad-CAM Hooks
+    
     activations = {}
     gradients = {}
-    
     def forward_hook(module, input, output):
         activations['value'] = output
-        
     def backward_hook(module, grad_in, grad_out):
         gradients['value'] = grad_out[0]
-        
     target_layer = model.layer4[-1]
     target_layer.register_forward_hook(forward_hook)
     target_layer.register_full_backward_hook(backward_hook)
